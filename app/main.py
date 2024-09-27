@@ -2,7 +2,7 @@ import secrets
 import base64
 
 from typing import List
-from fastapi import FastAPI, Response, UploadFile
+from fastapi import FastAPI, HTTPException, Response, UploadFile
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 from starlette.requests import Request
 from starlette.responses import Response
@@ -50,10 +50,12 @@ async def create_task() -> int:
 
 @app.post("/tasks/{task_id}/add_image/", status_code=201)
 async def add_image_to_task(task_id: int, image_name: str, image: UploadFile) -> int:
+    if image.content_type != "image/jpeg":
+        raise HTTPException(400, detail="Invalid document type")
     try:
         return await create_image_service(task_id=task_id, name=image_name, file=image)
     except IntegrityError:
-        return Response(status_code=404)
+        raise HTTPException(404, detail="Not Found")
 
 
 
@@ -67,7 +69,7 @@ async def retrieve_task(task_id: int) -> TaskWithImagesSchemaOut:
     try:
         return await get_task_with_images_service(task_id=task_id)
     except ValidationError:
-        return Response(status_code=404)
+        raise HTTPException(404, detail="Not Found")
 
 
 @app.get("/tasks/")
