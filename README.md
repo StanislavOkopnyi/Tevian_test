@@ -23,3 +23,9 @@ API_HOST="https://backend.facecloud.tevian.ru"
 EMAIL="user@example.com"
 PASSWORD="password"
 ```
+
+Настройка Basic Auth:
+```
+LOCAL_LOGIN="admin"
+LOCAL_PASSWORD="password"
+```

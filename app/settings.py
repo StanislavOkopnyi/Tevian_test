@@ -18,5 +18,8 @@ class Settings(BaseSettings):
     EMAIL: str
     PASSWORD: str
 
+    LOCAL_LOGIN: str
+    LOCAL_PASSWORD: str
+
 
 settings = Settings()

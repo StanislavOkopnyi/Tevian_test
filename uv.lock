@@ -590,6 +590,7 @@ dependencies = [
     { name = "pydantic-settings" },
     { name = "requests" },
     { name = "sqlalchemy" },
+    { name = "starlette" },
 ]
 
 [package.metadata]
@@ -602,6 +603,7 @@ requires-dist = [
     { name = "pydantic-settings", specifier = ">=2.5.2" },
     { name = "requests", specifier = ">=2.32.3" },
     { name = "sqlalchemy", specifier = ">=2.0.35" },
+    { name = "starlette", specifier = ">=0.38.6" },
 ]
 
 [[package]]
