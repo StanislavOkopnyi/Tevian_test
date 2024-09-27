@@ -16,8 +16,8 @@ class PersonSchemaOut(BaseModel):
 class ImageSchemaOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    persons: list[PersonSchemaOut]
     name: str
+    persons: list[PersonSchemaOut]
 
 class TaskWithImagesSchemaOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
