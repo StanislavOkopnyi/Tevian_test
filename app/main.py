@@ -65,7 +65,7 @@ async def create_task():
         status.HTTP_201_CREATED: {
             "content": {"application/json": {"example": {"image_id": 1}}},
         },
-        status.HTTP_400_BAD_REQUEST: {
+        status.HTTP_415_UNSUPPORTED_MEDIA_TYPE: {
             "content": {"application/json": {"example": {"detail": "Invalid document type"}}},
         },
         status.HTTP_404_NOT_FOUND: {
@@ -75,11 +75,11 @@ async def create_task():
 )
 async def add_image_to_task(task_id: int, image_name: str, image: UploadFile):
     if image.content_type != "image/jpeg":
-        raise HTTPException(400, detail="Invalid document type")
+        raise HTTPException(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, detail="Invalid document type")
     try:
         return {"image_id": await create_image_service(task_id=task_id, name=image_name, file=image)}
     except IntegrityError:
-        raise HTTPException(404, detail="Not Found")
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Not Found")
 
 
 @app.delete("/tasks/{task_id}/", status_code=status.HTTP_204_NO_CONTENT)
@@ -99,7 +99,7 @@ async def retrieve_task(task_id: int) -> TaskWithImagesSchemaOut:
     try:
         return await get_task_with_images_service(task_id=task_id)
     except ValidationError:
-        raise HTTPException(404, detail="Not Found")
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Not Found")
 
 
 @app.get("/tasks/")
