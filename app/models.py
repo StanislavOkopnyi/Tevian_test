@@ -1,9 +1,9 @@
 from typing import List
-from sqlalchemy import ForeignKey, String, inspect
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 from constants import GenderEnum
 from database import sync_engine
+from sqlalchemy import ForeignKey, String, inspect
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
 class Base(DeclarativeBase):

@@ -15,3 +15,9 @@ dependencies = [
     "sqlalchemy>=2.0.35",
     "starlette>=0.38.6",
 ]
+
+[tool.uv]
+dev-dependencies = [
+    "black>=24.8.0",
+    "isort>=5.13.2",
+]

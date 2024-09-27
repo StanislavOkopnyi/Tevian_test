@@ -1,15 +1,13 @@
 import os
-
 from dataclasses import dataclass
-from sqlalchemy import delete, select
-from sqlalchemy.exc import IntegrityError
-
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
-from sqlalchemy.orm import subqueryload
-from schema import ImageAnalysisSchemaIn, PersonSchemaIn
-from models import Image, Person, Task
 
 from database import async_session
+from models import Image, Person, Task
+from schema import ImageAnalysisSchemaIn, PersonSchemaIn
+from sqlalchemy import delete, select
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
+from sqlalchemy.orm import subqueryload
 
 
 @dataclass(frozen=True, slots=True)
@@ -33,6 +31,7 @@ class ImageRepository:
             path = path.scalar_one()
             await session.commit()
             os.remove(path)
+
 
 image_repository = ImageRepository()
 
@@ -70,7 +69,6 @@ class TaskRepository:
         async with self.async_session() as session:
             for image in task.images:
                 await self.image_repository.delete(image_id=image.id)
-
 
             stmt = delete(Task).where(Task.id == task_id)
             await session.execute(stmt)
@@ -111,5 +109,6 @@ class PersonRepository:
             await session.commit()
 
             return id
+
 
 person_repository = PersonRepository()

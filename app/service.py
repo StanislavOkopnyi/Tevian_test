@@ -1,18 +1,22 @@
-import aiofiles
-import requests
-import httpx
-
+from dataclasses import dataclass
 from uuid import uuid4
 
-from dataclasses import dataclass
-from fastapi import UploadFile
-
-from settings import settings
-from schema import ImageAnalysisSchemaIn, TaskSchemaOut, TaskWithImagesSchemaOut
-from repository import person_repository, image_repository, task_repository
+import aiofiles
+import httpx
+import requests
 from constants import GenderEnum
+from fastapi import UploadFile
+from repository import (
+    ImageRepository,
+    PersonRepository,
+    TaskRepository,
+    image_repository,
+    person_repository,
+    task_repository,
+)
+from schema import ImageAnalysisSchemaIn, TaskSchemaOut, TaskWithImagesSchemaOut
+from settings import settings
 
-from repository import TaskRepository, ImageRepository, PersonRepository
 
 @dataclass(frozen=True, slots=True)
 class CreateTaskService:
@@ -49,6 +53,7 @@ class GetAllTasksService:
         tasks = await self.task_repository.get_all()
         return [self.pydantic_class.model_validate(task) for task in tasks]
 
+
 get_all_tasks_service = GetAllTasksService()
 
 
@@ -84,7 +89,7 @@ class GetStatisticsFromImageAnalysisService:
         for image in images:
             for person in image.persons:
                 if person.gender == GenderEnum.male:
-                    i+=1
+                    i += 1
         return i
 
     def _get_female_num(self, data: TaskWithImagesSchemaOut) -> int:
@@ -93,7 +98,7 @@ class GetStatisticsFromImageAnalysisService:
         for image in images:
             for person in image.persons:
                 if person.gender == GenderEnum.female:
-                    i+=1
+                    i += 1
         return i
 
     def _get_male_mean_age(self, data: TaskWithImagesSchemaOut) -> int:
@@ -114,6 +119,7 @@ class GetStatisticsFromImageAnalysisService:
                     ages.append(person.age)
         return sum(ages) // len(ages) if ages else 0
 
+
 get_statistics_from_image_analysis_service = GetStatisticsFromImageAnalysisService()
 
 
@@ -133,6 +139,7 @@ class GetTaskWithImagesService:
             setattr(validated_data, key, value)
 
         return validated_data
+
 
 get_task_with_images_service = GetTaskWithImagesService()
 
@@ -159,6 +166,7 @@ class GetImageAnalysisService:
             result = result["data"]
             return [self.pydantic_class.model_validate(i) for i in result]
 
+
 get_image_analysis_service = GetImageAnalysisService()
 
 
@@ -175,7 +183,7 @@ class CreateImageService:
         image_id = await self.image_repository.create(name=name, path=path, task_id=task_id)
         image_analysis = await self.image_analysis_service(image=file)
 
-        async with aiofiles.open(path, 'wb') as out_file:
+        async with aiofiles.open(path, "wb") as out_file:
             while content := await file.read(1024):
                 await out_file.write(content)
 

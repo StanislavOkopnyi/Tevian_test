@@ -1,41 +1,43 @@
-import secrets
 import base64
-
+import secrets
 from typing import List
+
 from fastapi import FastAPI, HTTPException, Response, UploadFile, status
+from pydantic import ValidationError
+from schema import TaskSchemaOut, TaskWithImagesSchemaOut
+from service import (
+    create_image_service,
+    create_task_service,
+    delete_task_service,
+    get_all_tasks_service,
+    get_task_with_images_service,
+)
+from settings import settings
+from sqlalchemy.exc import IntegrityError
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 from starlette.requests import Request
 from starlette.responses import Response
-from pydantic import ValidationError
-from sqlalchemy.exc import IntegrityError
-
-from settings import settings
-from schema import TaskSchemaOut, TaskWithImagesSchemaOut
-from service import create_task_service, delete_task_service, get_all_tasks_service, get_task_with_images_service, create_image_service
-
 
 
 class ApidocBasicAuthMiddleware(BaseHTTPMiddleware):
 
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint):
-        auth_header = request.headers.get('Authorization')
+        auth_header = request.headers.get("Authorization")
         if auth_header:
             try:
                 scheme, credentials = auth_header.split()
-                if scheme.lower() == 'basic':
-                    decoded = base64.b64decode(credentials).decode('ascii')
-                    username, password = decoded.split(':')
-                    correct_username = secrets.compare_digest(
-                        username, settings.LOCAL_LOGIN)
-                    correct_password = secrets.compare_digest(
-                        password, settings.LOCAL_PASSWORD)
+                if scheme.lower() == "basic":
+                    decoded = base64.b64decode(credentials).decode("ascii")
+                    username, password = decoded.split(":")
+                    correct_username = secrets.compare_digest(username, settings.LOCAL_LOGIN)
+                    correct_password = secrets.compare_digest(password, settings.LOCAL_PASSWORD)
                     if correct_username and correct_password:
                         return await call_next(request)
             except Exception:
                 pass
 
-        response = Response(content='Unauthorized', status_code=status.HTTP_401_UNAUTHORIZED)
-        response.headers['WWW-Authenticate'] = 'Basic'
+        response = Response(content="Unauthorized", status_code=status.HTTP_401_UNAUTHORIZED)
+        response.headers["WWW-Authenticate"] = "Basic"
         return response
 
 
@@ -50,7 +52,7 @@ app.add_middleware(ApidocBasicAuthMiddleware)
         status.HTTP_201_CREATED: {
             "content": {"application/json": {"example": {"task_id": 1}}},
         },
-    }
+    },
 )
 async def create_task():
     return {"task_id": await create_task_service()}
@@ -69,7 +71,6 @@ async def create_task():
         status.HTTP_404_NOT_FOUND: {
             "content": {"application/json": {"example": {"detail": "Not Found"}}},
         },
-
     },
 )
 async def add_image_to_task(task_id: int, image_name: str, image: UploadFile):
@@ -79,7 +80,6 @@ async def add_image_to_task(task_id: int, image_name: str, image: UploadFile):
         return {"image_id": await create_image_service(task_id=task_id, name=image_name, file=image)}
     except IntegrityError:
         raise HTTPException(404, detail="Not Found")
-
 
 
 @app.delete("/tasks/{task_id}/", status_code=status.HTTP_204_NO_CONTENT)
@@ -93,7 +93,7 @@ async def delete_task(task_id: int):
         status.HTTP_404_NOT_FOUND: {
             "content": {"application/json": {"example": {"detail": "Not Found"}}},
         },
-    }
+    },
 )
 async def retrieve_task(task_id: int) -> TaskWithImagesSchemaOut:
     try:

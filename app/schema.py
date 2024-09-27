@@ -1,6 +1,6 @@
+from constants import GenderEnum
 from pydantic import BaseModel, ConfigDict
 
-from constants import GenderEnum
 
 class PersonSchemaOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -19,6 +19,7 @@ class ImageSchemaOut(BaseModel):
     name: str
     persons: list[PersonSchemaOut]
 
+
 class TaskWithImagesSchemaOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -36,25 +37,30 @@ class TaskSchemaOut(BaseModel):
 
     id: int
 
+
 class BoundingBox(BaseModel):
     height: int
     width: int
     x: int
     y: int
 
+
 class AgeInfoSchemaIn(BaseModel):
     mean: int
     variance: float
+
 
 class DemographicsInfoSchemaIn(BaseModel):
     gender: GenderEnum
     ethnicity: str
     age: AgeInfoSchemaIn
 
+
 class ImageAnalysisSchemaIn(BaseModel):
     bbox: BoundingBox
     demographics: DemographicsInfoSchemaIn
     score: float
+
 
 class PersonSchemaIn(BaseModel):
     gender: GenderEnum
